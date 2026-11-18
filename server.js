@@ -23,9 +23,9 @@ const num=(v,lo,hi)=>typeof v==='number'&&isFinite(v)?Math.max(lo,Math.min(hi,v)
 function clean(d,old){
  const o=Object.assign({},old);if(!d||typeof d!=='object')return o;
  if('n' in d){if(d.n===null)delete o.n;else if(typeof d.n==='string'){const n=d.n.replace(/[^\p{L}\p{N} _.\-]/gu,'').trim().slice(0,16);if(n.length>=2)o.n=n}}
- for(const [k,lo,hi] of [['m',0,15],['f',0,9],['x',-200,200],['z',-200,200],['y',-20,20],['s',0,12]]){if(k in d){const v=d[k]===null?null:num(d[k],lo,hi);if(v===null)delete o[k];else o[k]=k==='m'||k==='f'?Math.round(v):v}}
+ for(const [k,lo,hi] of [['m',-1,15],['f',0,9],['x',-200,200],['z',-200,200],['y',-20,20],['s',0,12]]){if(k in d){const v=d[k]===null?null:num(d[k],lo,hi);if(v===null)delete o[k];else o[k]=k==='m'||k==='f'?Math.round(v):v}}
  if('q' in d){if(d.q)o.q=1;else delete o.q}
- if('c' in d){const c=d.c;if(c&&typeof c==='object'&&typeof c.t==='string'&&typeof c.k==='number')o.c={k:c.k,t:c.t.replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,120)};else if(c===null)delete o.c}
+ if('c' in d){const c=d.c;if(c&&typeof c==='object'&&typeof c.t==='string'&&typeof c.k==='number')o.c={k:c.k,t:c.t.replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,200)};else if(c===null)delete o.c}
  return o;
 }
 function nameUsed(n,self){const l=n.toLowerCase();for(const c of clients.values())if(c!==self&&c.p.n&&c.p.n.toLowerCase()===l)return true;return false}
