@@ -874,7 +874,8 @@ const ACCT_KEY='stemtown_acct',NPC_NAMES=['Robot','Siêu nhân đỏ xanh','Quay
 let ACCT=null;
 try{const a=JSON.parse(localStorage.getItem(ACCT_KEY)||'null');if(a&&typeof a.name==='string'&&a.name)ACCT={name:a.name,m:Math.max(0,Math.min(NPC_DATA.length-1,a.m|0))}}catch(e){}
 if(!ACCT)ACCT={name:'',m:Math.floor(Math.random()*NPC_DATA.length)};
-function saveAcct(){try{localStorage.setItem(ACCT_KEY,JSON.stringify({name:ACCT.name,m:ACCT.m}))}catch(e){}}
+let LAST=ACCT.name;ACCT.name='';/* mỗi lần vào game đều đăng nhập lại: tên cũ chỉ để gợi ý */
+function saveAcct(){try{if(ACCT.name)LAST=ACCT.name;localStorage.setItem(ACCT_KEY,JSON.stringify({name:ACCT.name||LAST,m:ACCT.m}))}catch(e){}}
 const cleanName=s=>String(s==null?'':s).replace(/[^\p{L}\p{N} _.\-]/gu,'').replace(/\s+/g,' ').trim().slice(0,16);
 const NAME_OK=s=>s.length>=2&&/^[\p{L}\p{N}]/u.test(s);
 /* thẻ tên và bong bóng chat trên đầu nhân vật */
@@ -1037,7 +1038,7 @@ const lgEl=$('login'),lgName=$('lgName'),lgErr=$('lgErr'),lgGo=$('lgGo'),lgForm=
 function charCards(sel){return NPC_NAMES.slice(0,NPC_DATA.length).map((n,i)=>'<button type="button" class="chc'+(i===sel?' on':'')+'" data-m="'+i+'"><img alt="" src="'+NPC_PREV[i]+'">'+n+'</button>').join('')}
 function bindCards(box,fn){box.querySelectorAll('.chc').forEach(b=>b.onclick=()=>{box.querySelectorAll('.chc').forEach(x=>x.classList.toggle('on',x===b));fn(+b.dataset.m)})}
 let pendN='';
-function showLogin(){lgEl.hidden=false;lgForm.hidden=false;lgPick.hidden=true;lgErr.textContent='';lgName.value=ACCT.name||'';setTimeout(()=>{try{lgName.focus()}catch(e){}},50)}
+function showLogin(){lgEl.hidden=false;lgForm.hidden=false;lgPick.hidden=true;lgErr.textContent='';lgName.value=ACCT.name||LAST||'';setTimeout(()=>{try{lgName.focus()}catch(e){}},50)}
 function showPick(n){
  pendN=n;lgForm.hidden=true;lgPick.hidden=false;
  $('lgHi').textContent='Xin chào '+n+'! Chọn nhân vật sẽ xuất hiện trong thành phố.';
@@ -2318,12 +2319,6 @@ function savePos(){try{if(typeof P==='undefined'||!cf||first)return;localStorage
 function start(){
  try{buildG();build1();build2();build3()}catch(e){console.error(e);$('ldmsg').textContent='Lỗi dựng tầng: '+e.message;return}
  enterFloor(0,false);P.x=0;P.z=11;P.yaw=Math.PI;cam.yaw=0;
- try{const sp=JSON.parse(localStorage.getItem(POS_KEY)||'null');
-  if(sp&&floors[sp.f]&&isFinite(sp.x)&&isFinite(sp.z)){
-   enterFloor(sp.f,false);const b=cf.b;
-   if(sp.x>b.x1+.4&&sp.x<b.x2-.4&&sp.z>b.z1+.4&&sp.z<b.z2-.4){const r=resolve(sp.x,sp.z,.35);P.x=r[0]!==undefined?r[0]:(r.x!==undefined?r.x:sp.x);P.z=r[1]!==undefined?r[1]:(r.z!==undefined?r.z:sp.z);P.yaw=sp.yaw||0;cam.yaw=P.yaw+Math.PI}
-   else enterFloor(0,false);
-  }}catch(e){}
  setInterval(savePos,1000);window.addEventListener('pagehide',savePos);document.addEventListener('visibilitychange',()=>{if(document.hidden)savePos()});
  if(state.checkin)openGates(true);
  startOnline();
